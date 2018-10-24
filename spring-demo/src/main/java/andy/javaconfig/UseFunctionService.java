@@ -1,4 +1,4 @@
-package cn.andy.javaconfig;
+package andy.javaconfig;
 
 /**
  * @Author: zhuwei

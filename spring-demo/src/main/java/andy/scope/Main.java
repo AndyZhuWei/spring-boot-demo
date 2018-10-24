@@ -1,4 +1,4 @@
-package cn.andy.scope;
+package andy.scope;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

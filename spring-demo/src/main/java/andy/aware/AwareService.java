@@ -1,4 +1,4 @@
-package cn.andy.aware;
+package andy.aware;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.BeanNameAware;

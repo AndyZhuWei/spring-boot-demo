@@ -1,4 +1,4 @@
-package cn.andy.fortest;
+package andy.fortest;
 
 public class TestBean {
 

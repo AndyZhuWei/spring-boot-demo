@@ -1,4 +1,4 @@
-package cn.andy.taskexecutor;
+package andy.taskexecutor;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;

@@ -1,5 +1,7 @@
 package cn.andy.fortest;
 
+import andy.fortest.TestBean;
+import andy.fortest.TestConfig;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

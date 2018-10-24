@@ -5,8 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.andy.spring-boot</groupId>
-    <artifactId>spring-demo</artifactId>
+    <artifactId>spring-boot-demo-parent</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>spring-demo</module>
+    </modules>
 
     <properties>
         <spring-framework.version>4.3.5.RELEASE</spring-framework.version>

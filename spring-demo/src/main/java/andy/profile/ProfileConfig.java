@@ -1,4 +1,4 @@
-package cn.andy.profile;
+package andy.profile;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

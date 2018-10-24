@@ -1,4 +1,4 @@
-package cn.andy.profile;
+package andy.profile;
 
 /**
  * @Author: zhuwei

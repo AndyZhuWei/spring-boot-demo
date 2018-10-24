@@ -1,4 +1,4 @@
-package cn.andy.event;
+package andy.event;
 
 import org.springframework.context.ApplicationEvent;
 

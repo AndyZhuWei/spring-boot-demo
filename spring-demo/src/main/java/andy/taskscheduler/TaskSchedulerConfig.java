@@ -1,4 +1,4 @@
-package cn.andy.taskscheduler;
+package andy.taskscheduler;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

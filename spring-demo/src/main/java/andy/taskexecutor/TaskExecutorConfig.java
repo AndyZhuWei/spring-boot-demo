@@ -1,4 +1,4 @@
-package cn.andy.taskexecutor;
+package andy.taskexecutor;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.ComponentScan;

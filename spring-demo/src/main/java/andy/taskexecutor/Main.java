@@ -1,7 +1,6 @@
-package cn.andy.taskexecutor;
+package andy.taskexecutor;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * @Author: zhuwei

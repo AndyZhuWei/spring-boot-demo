@@ -1,4 +1,4 @@
-package cn.andy.taskscheduler;
+package andy.taskscheduler;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package cn.andy.aware;
+package andy.aware;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

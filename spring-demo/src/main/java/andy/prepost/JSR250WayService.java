@@ -1,4 +1,4 @@
-package cn.andy.prepost;
+package andy.prepost;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

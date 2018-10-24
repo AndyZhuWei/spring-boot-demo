@@ -1,4 +1,4 @@
-package cn.andy.fortest;
+package andy.fortest;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

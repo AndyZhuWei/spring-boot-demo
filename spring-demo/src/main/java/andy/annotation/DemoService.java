@@ -1,4 +1,4 @@
-package cn.andy.annotation;
+package andy.annotation;
 
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package cn.andy.prepost;
+package andy.prepost;
 
 /**
  * @Author: zhuwei

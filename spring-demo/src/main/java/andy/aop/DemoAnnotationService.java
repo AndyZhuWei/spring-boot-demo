@@ -1,4 +1,4 @@
-package cn.andy.aop;
+package andy.aop;
 
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package cn.andy.el;
+package andy.el;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

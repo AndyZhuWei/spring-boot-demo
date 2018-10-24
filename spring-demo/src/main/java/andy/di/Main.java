@@ -1,4 +1,4 @@
-package cn.andy.di;
+package andy.di;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

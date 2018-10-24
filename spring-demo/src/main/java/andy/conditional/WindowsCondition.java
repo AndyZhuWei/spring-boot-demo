@@ -1,4 +1,4 @@
-package cn.andy.conditional;
+package andy.conditional;
 
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
