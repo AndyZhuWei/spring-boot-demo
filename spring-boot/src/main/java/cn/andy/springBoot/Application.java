@@ -26,11 +26,15 @@ public class Application {
 	@Autowired
 	private AuthorSettings authorSettings;
 
+	@Autowired
+	private HelloService helloService;
+
 	@RequestMapping("/")
 	String index() {
 //		return "Hello Spring Boot";
 //		return "book name is:"+bookName+" and book author is:"+bookAuthor;
-		return "author name is:"+authorSettings.getName()+" and author age is:"+authorSettings.getAge();
+//		return "author name is:"+authorSettings.getName()+" and author age is:"+authorSettings.getAge();
+		return helloService.sayHello();
 	}
 
 

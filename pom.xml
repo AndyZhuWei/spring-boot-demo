@@ -11,6 +11,7 @@
     <modules>
         <module>spring-demo</module>
         <module>spring-mvc-demo</module>
+        <module>spring-boot-starter-hello</module>
     </modules>
 
 
