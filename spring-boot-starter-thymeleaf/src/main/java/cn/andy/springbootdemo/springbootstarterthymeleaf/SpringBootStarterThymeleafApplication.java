@@ -14,7 +14,7 @@ import java.util.List;
 @SpringBootApplication
 public class SpringBootStarterThymeleafApplication {
 
-	@RequestMapping("/")
+	@RequestMapping("/index")
 	public String index(Model model) {
 		Person single = new Person("aa",11);
 		List<Person> people = new ArrayList<Person>();

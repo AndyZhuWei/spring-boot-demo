@@ -3,7 +3,7 @@
     <meta content="text/html;charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link th:href="@{bootstrap/css/bootstrap.min.css}" rel="stylesheet" />
+    <link th:href="@{bootstrap/css/bootstrap.css}" rel="stylesheet" />
     <link th:href="@{bootstrap/css/bootstrap-theme.min.css}" rel="stylesheet" />
 </head>
 <body>
@@ -25,19 +25,18 @@
                 <ul class="list-group">
                     <li class="list-group-item" th:each="person:${people}">
                         <span th:text="${person.name}"></span>
-                        <span th:text="${people.age}"></span>
-                        <button class="btn" th:onclick="'getName(\''+${person.name}
-                    +'\');'">获得名字</button>
+                        <span th:text="${person.age}"></span>
+                       <!-- <button class="btn" th:onclick="'getName(\''+${person.name}+'\')'">获得名字</button>-->
                     </li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <script th:src="@{jquery-1.10.2.min.js}" type="text/javascript"></script>
+    <script th:src="@{jquery.min.js}" type="text/javascript"></script>
     <script th:src="@{bootstrap/js/bootstrap.min.js}"></script>
 
-    <script th:include="javascript">
+    <script th:inline="javascript">
         var single = [[${singlePerson}]];
         console.log(single.name+"/"+single.age);
 
