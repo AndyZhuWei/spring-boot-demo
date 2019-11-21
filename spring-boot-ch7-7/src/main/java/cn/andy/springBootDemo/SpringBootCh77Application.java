@@ -20,4 +20,5 @@ public class SpringBootCh77Application {
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootCh77Application.class, args);
 	}
+
 }

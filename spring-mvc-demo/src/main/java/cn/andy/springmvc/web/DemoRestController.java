@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @Date:2018/10/24 13:44
  * @Description:
  */
-//声明@MyRestController，声明是控制器，并且返回数据时不需要@ResponseBody
+//使用@RestController，声明是控制器，并且返回数据时不需要@ResponseBody
 @RestController
 @RequestMapping("/rest")
 public class DemoRestController {

@@ -20,12 +20,24 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer{
     //注册STOMP协议的节点（endpoint），并映射的指定URL
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/endpointWisely").withSockJS();//注册一个STOMP的endpoint，并指定使用SockJS协议
+        //registry.addEndpoint().withSockJS();//注册一个STOMP的endpoint，并指定使用SockJS协议
+        //注册一个名为/endpointChat的endpoint
+        registry.addEndpoint("/endpointChat","/endpointWisely").withSockJS();
     }
 
     //配置消息代理（Message Broker）
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic");//广播式应配置一个/topic消息代理
+       // registry.enableSimpleBroker("/topic");//广播式应配置一个/topic消息代理
+        //点对点式增加一个/queue消息代理
+        registry.enableSimpleBroker("/queue","/topic");
     }
 }
+
+
+
+
+
+
+
+

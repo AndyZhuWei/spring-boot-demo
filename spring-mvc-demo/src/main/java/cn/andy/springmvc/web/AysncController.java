@@ -10,7 +10,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 /**
  * @Author: zhuwei
  * @Date:2018/10/24 17:18
- * @Description: 异步任务的实现是通过控制器从另外一个线程返回一个DeferredResult,这里的DeferredResult是从pushService中获得的
+ * @Description: 异步任务的实现是通过控制器从另外一个线程返回一个DeferredResult,
+ * 这里的DeferredResult是从pushService中获得的
  */
 @Controller
 public class AysncController {

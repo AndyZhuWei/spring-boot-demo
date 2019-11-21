@@ -15,7 +15,7 @@ import java.util.concurrent.Executor;
  * @Description:
  */
 @Configuration
-@ComponentScan("cn.andy.taskexecutor")
+@ComponentScan("andy.taskexecutor")
 //利用@EnableAsync注解开启异步任务支持
 @EnableAsync
 public class TaskExecutorConfig implements AsyncConfigurer {

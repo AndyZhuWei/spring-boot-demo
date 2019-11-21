@@ -16,10 +16,10 @@ import org.springframework.core.io.Resource;
  * @Description:
  */
 @Configuration
-@ComponentScan("cn.andy.el")
+@ComponentScan("andy.el")
 //注入配置文件需要使用@PropertySource指定文件地址，若使用@Value注入，则要配置
 //一个PropertySourcesPlaceholderConfigurer的Bean
-@PropertySource("classpath:cn/andy/el/test.properties")
+@PropertySource("classpath:andy/el/test.properties")
 public class ELConfig {
 
     //注入普通字符串
@@ -39,7 +39,7 @@ public class ELConfig {
     private String fromAnother;
 
     //注入文件资源
-    @Value("classpath:cn/andy/el/test.txt")
+    @Value("classpath:andy/el/test.txt")
     private Resource testFile;
 
     //注入网址资源

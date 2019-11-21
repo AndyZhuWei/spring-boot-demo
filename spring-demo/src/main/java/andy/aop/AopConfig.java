@@ -10,7 +10,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * @Description: 配置类
  */
 @Configuration
-@ComponentScan("cn.andy.aop")
+@ComponentScan("andy.aop")
 //使用@EnableAspectJAutoProxy注解开启Spring对AspectJ代理的支持
 @EnableAspectJAutoProxy
 public class AopConfig {

@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 public class LogAspect {
 
     //通过@PointCut注解声明切点
-    @Pointcut("@annotation(cn.andy.aop.Action)")
+    @Pointcut("@annotation(andy.aop.Action)")
     public void annotationPointCut(){};
 
 
@@ -37,7 +37,7 @@ public class LogAspect {
     }
 
     //通过@Before注解声明一个建言，此建言直接使用拦截规则作为参数
-    @Before("execution(* cn.andy.aop.DemoMethodService.*(..))")
+    @Before("execution(* andy.aop.DemoMethodService.*(..))")
     public void before(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
         Method method = signature.getMethod();

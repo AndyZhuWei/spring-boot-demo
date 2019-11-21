@@ -30,7 +30,7 @@ public class JavaConfig {
 
     //另外一种注入方式，直接将FunctionService作为参数给useFunctionService()，这也是Spring容器提供
     //的极好的功能。在Spring容器中，只要容器中存在某个Bean,就可以在另外一个Bean的声明方法的参数中写入
-//    @Bean
+  //  @Bean
 //    public UseFunctionService useFunctionService(FunctionService functionService) {
 //        UseFunctionService useFunctionService = new UseFunctionService();
 //        useFunctionService.setFunctionService(functionService);

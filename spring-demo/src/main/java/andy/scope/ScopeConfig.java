@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
  * @Description:
  */
 @Configuration
-@ComponentScan("cn.andy.scope")
+@ComponentScan("andy.scope")
 public class ScopeConfig {
 }

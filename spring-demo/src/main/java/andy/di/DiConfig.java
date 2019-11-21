@@ -12,6 +12,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 //@ComponentScan，自动扫描包名下所有使用@Service、@Component、@Repository和
 //@Controller的类，并注册为Bean
-@ComponentScan("cn.andy.di")
+@ComponentScan("andy.di")
 public class DiConfig {
 }

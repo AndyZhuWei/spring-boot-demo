@@ -11,8 +11,14 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.view.AbstractTemplateViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
+import org.thymeleaf.spring4.SpringTemplateEngine;
+import org.thymeleaf.spring4.view.ThymeleafView;
+import org.thymeleaf.spring4.view.ThymeleafViewResolver;
+import org.thymeleaf.templateresolver.AbstractConfigurableTemplateResolver;
+import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import java.util.List;
 
@@ -23,13 +29,14 @@ import java.util.List;
  */
 @Configuration
 //@EnableWebMvc注解会开启一些默认配置，如一些ViewResolver或者MessageConverter等,
-//如果美哟此句，重写WebMvcConfigurerAdapter方法无效
+//如果没有此句，重写WebMvcConfigurerAdapter方法无效
 @EnableWebMvc
 @EnableScheduling
 @ComponentScan("cn.andy.springmvc")
 //继承WebMvcConfigurationAdapter类，重写其方法可对Spring MVC进行配置
 public class MyMvcConfig extends WebMvcConfigurerAdapter{
 
+    //配置JSP模板引擎
     @Bean
     public InternalResourceViewResolver viewResolver() {
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
@@ -52,7 +59,8 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter{
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //addResourceLocations值的是文件放置的目录
         //addResourceHandler指的是对外暴露的访问路径
-        registry.addResourceHandler("/assets/**").addResourceLocations("classpath:/assets/");
+        registry.addResourceHandler("/assets/**")
+                .addResourceLocations("classpath:/assets/");
     }
 
     //配置拦截器的Bean
@@ -95,4 +103,34 @@ public class MyMvcConfig extends WebMvcConfigurerAdapter{
     public MyMessageConverter converter() {
         return new MyMessageConverter();
     }
+
+    /*
+    Thymeleaf与Spring MVC集成，例子中AbstractConfigurableTemplateResolver为TemplateResolver
+    但是TemplateResolver找不到
+
+
+    @Bean
+    public AbstractConfigurableTemplateResolver templateResolver() {
+        AbstractConfigurableTemplateResolver templateResolver = new ServletContextTemplateResolver();
+        templateResolver.setPrefix("/WEB-INF/templates");
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode("HTML5");
+        return templateResolver;
+    }
+
+    @Bean
+    public SpringTemplateEngine templateEngine() {
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver());
+        return templateEngine;
+    }
+
+    @Bean
+    public ThymeleafViewResolver thymeleafViewResolver() {
+        ThymeleafViewResolver thymeleafViewResolver = new ThymeleafViewResolver();
+        thymeleafViewResolver.setTemplateEngine(templateEngine());
+    //    thymeleafViewResolver.setViewClass(ThymeleafView.class);
+        return thymeleafViewResolver;
+    }*/
+
 }

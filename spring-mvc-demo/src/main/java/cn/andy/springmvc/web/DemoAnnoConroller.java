@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/anno")
 public class DemoAnnoConroller {
 
-    //此方法未表述路径，因此使用类级别的路径/anno;produces可定制返回的response的
+    //此方法未标注路径，因此使用类级别的路径/anno;produces可定制返回的response的
     //媒体类型和字符集，或需返回值是json对象，则设置produces="application/json;charset=UTF-8",
     @RequestMapping(produces = "text/plain;charset=UTF-8")
     public @ResponseBody String index(HttpServletRequest request) {//可接受HttpServletRequest作为参数，当然也可以接受HttpServletReponse作为参数
@@ -39,11 +39,12 @@ public class DemoAnnoConroller {
         return "url:"+request.getRequestURI()+" can access,id: "+id;
     }
 
-    //解释参数到对象，访问路径为/anno/obj?id=1&name=xx
+    //演示解释参数到对象，访问路径为/anno/obj?id=1&name=xx
     @RequestMapping(value="/obj",produces = "text/plain;charset=UTF-8")
     //@ResponseBody也可以用在方法上
     @ResponseBody
     public String passObj(DemoObj obj,HttpServletRequest request) {
+
         return "url:"+request.getRequestURI()+" can access,obj id: "+obj.getId()+" obj name:"+obj.getName();
     }
 

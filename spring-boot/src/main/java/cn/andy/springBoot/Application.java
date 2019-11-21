@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +35,7 @@ public class Application {
 	String index() {
 //		return "Hello Spring Boot";
 //		return "book name is:"+bookName+" and book author is:"+bookAuthor;
-//		return "author name is:"+authorSettings.getName()+" and author age is:"+authorSettings.getAge();
+	//	return "author name is:"+authorSettings.getName()+" and author age is:"+authorSettings.getAge();
 		return helloService.sayHello();
 	}
 

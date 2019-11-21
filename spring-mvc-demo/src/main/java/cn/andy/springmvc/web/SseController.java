@@ -23,6 +23,6 @@ public class SseController {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return "data:Testing 1,2,3"+r.nextInt()+"\n\n";
+        return "data:Testing 1,2,3"+r.nextInt()+"\n\n";//注意数据都是以data:为前缀
     }
 }

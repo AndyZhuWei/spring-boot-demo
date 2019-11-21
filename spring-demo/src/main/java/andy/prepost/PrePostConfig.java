@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
  * @Description:
  */
 @Configuration
-@ComponentScan("cn.andy.prepost")
+@ComponentScan("andy.prepost")
 public class PrePostConfig {
 
     //initMethod和destroyMethod指定BeanWayService类的init和destroy方法在构造之后Bean销毁之前执行

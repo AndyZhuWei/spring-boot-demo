@@ -36,7 +36,7 @@ public class AwareService implements BeanNameAware,ResourceLoaderAware {
     public void outputResult() {
         System.out.println("Bean的名称为："+beanName);
 
-        Resource resource = loader.getResource("classpath:cn/andy/aware/test.txt");
+        Resource resource = loader.getResource("classpath:andy/aware/text.txt");
 
         try {
             System.out.println("ResourceLoader加载的文件内容为："+ IOUtils.toString(resource.getInputStream()));

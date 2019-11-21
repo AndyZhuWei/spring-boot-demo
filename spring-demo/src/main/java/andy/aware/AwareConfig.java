@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
  * @Description:
  */
 @Configuration
-@ComponentScan("cn.andy.aware")
+@ComponentScan("andy.aware")
 public class AwareConfig {
 }

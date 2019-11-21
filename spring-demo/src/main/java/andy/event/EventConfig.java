@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
  * @Description:
  */
 @Configuration
-@ComponentScan("cn.andy.event")
+@ComponentScan("andy.event")
 public class EventConfig {
 }

@@ -19,6 +19,7 @@
     </properties>
 
     <dependencies>
+        <!--此处增加Spring Boot自身的自动配置作为依赖-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>

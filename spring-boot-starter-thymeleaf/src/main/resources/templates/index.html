@@ -26,7 +26,8 @@
                     <li class="list-group-item" th:each="person:${people}">
                         <span th:text="${person.name}"></span>
                         <span th:text="${person.age}"></span>
-                       <!-- <button class="btn" th:onclick="'getName(\''+${person.name}+'\')'">获得名字</button>-->
+                            <button class="btn" th:onclick="getName([[${person.name}]]);">获得名字</button>
+                       <!--<button class="btn" th:onclick="'getName(\''+${person.name}+'\');'">获得名字</button>-->
                     </li>
                 </ul>
             </div>

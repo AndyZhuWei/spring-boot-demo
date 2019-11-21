@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @Description:
  */
 @Configuration
-@ComponentScan("cn.andy.taskscheduler")
+@ComponentScan("andy.taskscheduler")
 //通过@EnableScheduling注解开启对计划任务的支持
 @EnableScheduling
 public class TaskSchedulerConfig {
