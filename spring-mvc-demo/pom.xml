@@ -96,7 +96,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
-            <version>2.5.3</version>
+            <version>2.7.8</version>
         </dependency>
         <!--实际项目中，我们其实主要支持json数据，没必要同时支持json和xml，因为json比xml更简洁，
         此时上边的依赖包含下边的-->
