@@ -180,9 +180,98 @@ protected void configure(HttpSecurity http) throws Exception {
            .permitAll();
 }
 ```
-
-
-
+###9.1.2 Spring Bootd的支持
+ Spring Boot针对Spring Security的自动配置在org.springframework.boot.autoconfigure.security包中。
+ 主要通过SecurityAutoConfiguraton和SecurityProperties来完成配置
+ SecurityAutoConfiguration导入了SpringBootWebSecurityConfiuration中的配置。在SpringBootWebSecurityConfiguration配置中，我们
+ 获得如下的自动配置：
+ 1）自动配置了一个内存中的用户，账号为user,密码在程序启动时出现。
+ 2）忽略/css/**、/js/**、/images/**和/**/favicon.ico等静态文件的拦截
+ 3）自动配置的securityFilterChainRegistration的Bean
+ SecurityProperties使用以"security"为前缀的属性配置Spring Security相关的配置，包含：
+ security.user.name=user#内存中的用户默认账号为user
+ security.user.password=#1默认用户的密码
+ security.user.role=USER#默认用户的角色
+ security.require-ssl=false#是否需要ssl支持
+ security.enable-csrf=false#是否开启“跨站请求伪造”支持，默认关闭
+ security.basic.enabled=true
+ security.basic.realm=Spring
+ security.basic.path=#/**
+ security.basic.authorized-mode=
+ security.filter-order=0
+ security.headers.xss=false
+ security.headers.cache=false
+ security.headers.frame=false
+ security.headers.content-type=false
+ security.headers.hsts=all
+ security.sessions=stateless
+ security.ignored=#用逗号隔开的无须拦截的路径
+ Spring Boot为我们做了如此多的配置，当我们需要自己扩展配置的时，只需配置类继承WebSecurityConfigurerAdapter类即可，无须使用
+ @EnableWebSecurity注解
+ ```java
+@Configuration
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    
+}
+```
+### 9.1.3实战
+在本节的示例中，我们将演示使用Spring Boot下的Spring Security的配置，完成简单认证授权的功能。此节我们将通过Spring Data JPA获得用户数据。
+页面模板使用Thymeleaf,Thymeleaf也为我们提供了支持Spring Security的标签
+1.新建Spring Boot项目
+spirng-boot-security-demo
+新建Spring Boot项目，依赖为JPA、Security(Spring-boot-starter-security)、Thymeleaf(spring-boot-starter-thymeleaf)
+添加Oracle驱动及Thymeleaf的Spring Security的支持
+配置applicaiton.properties以及把bootstrap.min.css放置在src/main/resources/static/css下，此路径默认不拦截
+2.用户和角色
+我们使用JPA来定义用户和角色
+用户：
+SysUser
+角色：
+SysRole
+（1）数据结构及初始化
+当我们配置用户和角色的多对多关系后，通过设置
+spring.jpa.hibernate.ddl-auto=update
+为我们自动生成用户表:SYS_USER、角色表:SYS_ROLE、关联表SYS_USER_ROLES
+针对上面的表结构，我们初始化一些数据来方便我们演示。在src/main/resources下，新建data.sql,
+即新建两个用户，角色分别为ROLE_ADMIN和ROLE_USER，代码如下：
+（2）传值对象
+用来测试不同角色用户的数据展示:
+Msg
+3.数据访问
+我们这里的数据访问很简单，代码如下：
+SysUserRepository
+4.自定义UserDetailsService
+CustomUserService
+5.配置
+（1）Spring MVC配置：
+WebMvcConfig
+（2）Spring Security配置：
+WebSecurityConfig
+6.页面
+（1）登录页面
+login.html
+（2）首页
+home.html
+7.控制器
+此控制器很简单，只为首页显示准备数据:
+HomeController
+8.运行
+(1)登录。访问http://localhost:8080,将会自动转到登录页面http://localhost:8080/login
+使用正确的账号密码登录
+使用错误的账号密码登录
+(2)注销。登录成功后，单击注销按钮
+(3)用户信息
+页面上我们将用户名显示在页面的标题上
+(4)视图控制
+wyf和wisely用户角色不同，因此获得不同的视图
+注意：测试时发现页面标签sec:authentication不起作用，最后在pom.xml文件中加入一下属性即可
+  <properties>
+        <!-- upgrade to thymeleaf version 3 -->
+        <thymeleaf.version>3.0.8.RELEASE</thymeleaf.version>
+        <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
+        <thymeleaf-extras-springsecurity4.version>3.0.2.RELEASE</thymeleaf-extras-springsecurity4.version>
+    </properties>
+还没有测试通过
 
 
 

@@ -134,6 +134,457 @@ docker pull rabbitmq
 docker pull rabbitmq:3-management
 
 
+## 9.3异步消息
+   异步消息主要目的是为了系统与系统之间的通信。所谓异步消息即消息发送者无须等待消息接收者的处理及返回，甚至无须关心消息是否发送成功。
+   在异步消息中有两个很重要的概念，即消息代理(message broker)和目的地(destination).当消息发送者发送消息后，消息将由消息代理
+接管，消息代理保证消息传递到指定的目的地。
+   异步消息主要有两种形式的目的地：队列(queue)和主题(topic)。队列用于点对点式(point-to-point)的消息通信；主题用于发布/订阅式(
+publish-subscribe)的消息通信。
+1.点对点式
+   当消息发送者发送消息，消息代理获得消息后将消息放进一个队列(queue)里，当有消息接收者来接收消息的时候，消息将从队列里取出来传递给接收者，
+这时候队列里就没有了这条消息。
+   点对点式确保的是每一条消息只有唯一的发送者和接收者，但这并不能说明只有一个接收者可以从队列里接收消息。因为队列里有多个消息，点对点式只
+保证每一条消息只有唯一的发送者和接收者。
+2.发布/订阅式
+  和点对点式不同，发布/订阅式是消息发送者发送消息到主题(topic)，而多个消息接收者监听这个主题。此时的消息发送者和接收者分别叫做发布者和订阅者
+### 9.3.1 企业级消息代理
+  JMS(Java Message Service)即Java消息服务，是基于JVM消息代理的规范。而ActiveMQ、HornetQ是一个JMS消息代理的实现。
+  AMQP（Advanced Message Queuing Protocol）也是一个消息代理的规范，但它不仅兼容JMS,还支持跨语言和平台。AMQP的主要实现有RabbitMQ
+### 9.3.2 Spring的支持
+
+  Spring对JMS和AMQP的支持分别来自于spring-jms和spring-rabbit
+  它们分别需要ConnectionFactory的实现来连接消息代理，并分别提供了JmsTemplate、RabbitTemplate来发送消息
+  Spring为JMS、AMQP提供了@JmsListener、@RabbitListener注解在方法上监听消息代理发布的消息。我们需要分别通过@EnableJms、@EnableRabbit开启支持。
+### 9.3.3 Spring Boot的支持
+  Spring Boot对JMS的自动配置支持位于org.springframework.boot.autoconfigure.jms下，支持JMS的实现有ActiveMQ、HornetQ、Artemis(由HornetQ
+捐赠给ActiveMQ的代码块形成的ActiveMQ的子项目)。这里我们以ActiveMQ为例，Spring Boot为我们定义了ActiveMQConnectionFactory的Bean作为连接，
+并通过”spring.activemq“为前缀的属性来配置ActiveMQ的连接属性，包含：
+spring.activemq.broker-url=tcp://localhost:61616#消息代理的路径
+spring.activemq.user=       
+spring.activemq.password=       
+spring.activemq.in-memory=true       
+spring.activemq.pooled=false
+  Spring Boot在JmsAutoConfiguration还为我们配置好了JmsTemplate，且为我们开启了注解式消息监听的支持，即自动开启@EnableJms
+  Spring Boot对AMQP的自动配置支持位于org.springframework.boot.autoconfigure.amqp下，它为我们配置了连接的ConnectionFactory
+和RabbitTemplate,且为我们开启了注解式消息监听，即自动开启@EnableRabbit。RabbitMQ的配置可通过"spring.rabbitmq"来配置RabbitMQ,
+主要包含:
+spring.rabbitmq.host=localhost#rabbitmq服务地址，默认为localhost
+spring.rabbitmq.port=5672#rabbitmq端口，默认为5672
+spring.rabbitmq.username=admin
+spring.rabbitmq.password=secret
+### 9.3.4JMS实战
+参见spring-boot-jms-demo
+### 9.3.5 AMQP实战
+参见spring-boot-rabbitmq-demo
+
+
+## 9.4系统集成Spring Integration
+### 9.4.1Spring Integration快速入门
+    Spring Ingegration提供了基于Spring的EIP(Enterprise Integration Patterns，企业集成模式)
+的实现。Spring Integration主要解决的问题是不同系统之间交互的问题，通过异步消息驱动来达到系统交互时系统之间的松耦合。本节将基于无XMLp配置的原则
+使用Java配置、注解以及Spring Integration Java DSL来使用Spring Integration
+    Spring Integration主要由Message、Channel和Message EndPoint组成。
+### 9.4.2 Message
+    Message是用来在不同部分之间传递的数据。Message由两部分组成:消息体(payload)与消息头(header)。消息体可以是任何数据类型(如XML、JSON、Java
+对象);消息头表示的元数据就是解释消息体的内容
+```java
+public interface Message<T> {
+    T getPayload();
+    MessageHeaders getHeaders();
+}
+```
+### 9.4.3Channel
+在消息系统中，消息发送者发送消息到通道(Channel)，消息接收者从通道(Chanel)接收消息
+1.顶级接口
+（1）MessageChanel
+MessageChannel是Spring Integration消息通道的顶级接口：
+```java
+public interface MessageChannel {
+    public static final long INDEFINITE_TIMEOUT = -1;
+    boolean send(Message<?> message);
+    boolean send(Message<?> message,long timeout);
+}
+```
+当使用send方法发送消息时，返回值为true，则表示消息发送成功。MessageChannel有两大子接口，分别为PollableChannel(可轮询)和SubscribableChannel(
+可订阅)。我们所有的消息通道类都是实现这两个接口。
+（2）PollableChannel
+PollableChannel具备轮询获得消息的能力，定义如下：
+```java
+public interface PollableChannel extends MessageChannel {
+    Message<?> receive();
+    Message<?> receive(long timeout);
+}
+```
+(3)SubscribableChannel
+SubscribableChannel发送消息给订阅了MessageHandler的订阅者
+```java
+public interface SubscribableChannel extends MessageChannel {
+    boolean subscribe(MessageHandler handler);
+    boolean unsbuscribe(MessageHndler handler);
+}
+```
+2.常用消息通道
+（1）PublishSubscribeChannel
+PublishSubscribeChannel允许广播消息给所有订阅者，配置方式如下：
+```java
+@Bean
+public PublishSubscribeChannel publishSubscribeChannel() {
+    PublishSubscribeChannel channel = new PublishSubscribeChannel();
+    return channel;
+}
+```
+当中，当前消息通道的id为publishSubscribeChannel
+(2)QueueChannel
+QueueChannel允许消息接收者轮询获得信息，用一个队列(queue)接收消息，队列的容量大小可配置，配置方式如下：
+```java
+@Bean
+public QueueChannel queueChannel() {
+    QueueChannel channel = new QueueChannel(10);
+    return channel;
+}
+```
+其中QueueChannel构造参数10即为队列的容量
+（3）PriorityChannel
+PriorityChannel可按照优先级将数据存储到对，它依据于消息的消息头priority属性，配置方式如下：
+```java
+@Bean
+public PriorityChannel priorityChannel() {
+    PriorityChannel channel = new PriorityChannel(10);
+    return channel;
+}
+```
+(4)RendezvousChannel
+RendezvousChannel确保每一个接收者都接收到消息后再发送消息，配置方式如下:
+```java
+@Bean
+public RendezvousChannel rendezvousChannel() {
+    RendezvousChannel channel = new RendezvousChannel();
+    return channel;
+}
+```
+（5）DirectChannel
+DirectChannel是Spring Integration默认的消息通道，它允许将消息发送给为一个订阅者，然后阻碍发送直到消息被接收，配置方式如下：
+```java
+@Bean 
+public DirectChannel directChannel() {
+    DirectChannel channel = new DirectChannel();
+    return channel;
+}
+```
+(6)ExecutorChannel
+ExecutorChannel可绑定一个多线程的task executor，配置方式如下：
+```java
+@Bean 
+public ExecutorChannel executorChannel() {
+    ExecutorChannel channel = new ExecutorChanenl(executor());
+    return channel;
+}
+
+@Bean 
+public Executor executor() {
+    ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+    taskExecutor.setCorePoolSize(5);
+    taskExecutor.setMaxPoolSize(10);
+    taskExecutor.setQueueCapacity(10);
+    taskExecutor.initialize();
+    return taskExecutor;
+}
+```
+3.通道拦截器
+Spring Integration给消息通道提供了通道拦截器（ChannelInterceptor），用来拦截发送和接收消息的操作。
+ChannelInterceptor接口定义如下，我们只需实现这个接口即可:
+...
+我们通过下面的代码给所有的channel增加拦截器:
+channel.addInterceptor(someInterceptor);
+### 9.4.4 Message EndPoint
+消息端点(Message Endpoint)是真正处理消息的(Message)组件，它还可以控制通道的路由。我们可用的消息端点包含如下：
+（1）Channel Adapter
+通道适配器(Channel Adapter)是一种连接外部系统或传输协议的端点(EndPoint)，可以分为入站(inbound)和出站(outbound)
+通道适配器是单向的，入站通道适配器只支持接收消息，出站通道适配器只支持输出消息。
+Spring Integration内置了如下的适配器:
+RabbitMQ、Feed、File、FTP/SFTP、Gemfire、HTTP、TCP/UDP、JDBC、JPA、JMS、Mail、MongoDB、Redis、RMI、Twitter、
+XMPP、WebServices(SOAP、REST)、WebSocket等
+Spring Integration extensions项目提供了更多的支持，地址为https://github.com/springprojects/spring-integration-extensions
+(2)Gateway
+消息网关(Gateway)类似于Adapter，但是提供了双向的请求/返回集成方式，也分为入站(inbound)和出站(outbound)。Spring Integration对相应的
+Adapter多都提供了Gateway
+(3)Service Activator
+Service Activator可调用Spring的Bean来处理消息，并将处理后的结果输出到指定的消息通道
+（4）Router
+路由(Router)可根据消息体类型(Payload Type Router)、消息头的值(Header Value Router)以及定义好的接收表(Recipient List Router)作为条件，
+来决定消息传递的通道。
+（5）Filter
+过滤器（Filter）类似于路由（Router）,不同的是过滤器不决定消息路由到哪里，而是决定消息是否可以传递给消息通道。
+（6）Splitter
+拆分器（Splitter）将消息拆分为几个部分单独处理，拆分器处理的返回值是一个集合或者数组
+（7）Aggregator
+聚合器（Aggregator）与拆分器相反，它接收一个java.util.List作为参数，将多个消息合并为一个消息
+（8）Enricher
+当我们从外部获得消息后，需要增加额外的消息到已有的消息中，这时就需要使用消息增强器(Enricher)。消息增强器主要有消息体增强器(Payload Enricher)
+和消息头增强器(Header Enricher)两种
+（9）Transformer
+转换器(Transformer)是对获得的消息进行一定的逻辑转换处理（如数据格式转换）。
+（10）Bridge
+使用连接桥（Bridge）可以简单地将两个消息通道连接起来
+### 9.4.5 Spring Integration Java DSL
+Spring Integration 提供了一个IntegrationFlow来定义系统继承流程，而通过IntegrationFlows和IntegrationFlowBuilder来实现使用Fluent API
+来定义流程。在Fluent API里，分别提供了下面方法来映射Spring Integration的端点(EndPoint).
+transform() -> Transformer
+filter()   -> Filter
+handle()   -> ServiceActivator、Adapter、Gateway
+split()  -> Splitter
+aggrregate()  ->  Aggregator
+route()   -> Router
+bridge()   ->  Bridge
+一个简单的流程定义如下：
+```java
+@Bean 
+public IntegrationFlow demoFlow() {
+    return IntegrationFlows.form("input")//从Channel input获取消息
+       .<String,Integer>transform(Integer::parseInt)//将消息转换成整数
+       .get();//获得集成流程并注册为Bean
+}
+```
+### 9.4.6 实战
+spring-boot-integration-demo
+# 第10章 Spring Boot开发部署与测试
+## 10.1开发的热部署
+### 10.1.1 模板热部署
+在Spring Boot里，模板引擎的页面默认是开启缓存的，如果修改了页面的内容，则刷新页面是得不到修改后的页面的，因此我们可以在application.properties
+中关闭模板引擎的缓存。例如
+Thymeleaf的配置：
+spring.thymeleaf.cache=false
+FreeMarker的配置:
+spring.freemarker.cache=false
+Groovy的配置：
+spring.groovy.template.cache=false
+Velocity的配置：
+spring.velocity.cache=false
+###10.1.2 Spring Loaded
+Spring Loaded可实现修改类文件的热部署。下载Spring Loaded.
+然后在启动程序时在vm arguments中输入一下内容：
+-javaagent:xxxx\springloaded-1.2.3.RELEASE.jar -noverify
+### 10.1.3 JRebel
+JRebel是Java开发热部署的最佳工具，其对Spring Boot也提供了极佳的支持。JRebel为收费软件，可试用14天
+### 10.1.4spring-boot-devtools
+在Spring Boot项目中添加spring-boot-devtools依赖即可实现页面，即代码的热部署
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-devtools</artifactId>
+</dependency>
+## 10.2常规部署
+### 10.2.1jar形式
+1.打包
+若我们在新建Spring Boot项目的时候，选择打包的方式为jar，则我么只需要用：
+mvn package
+2.运行
+java -jar xx.jar
+3.注册为Linux的服务
+Linux下运行的软件我们通常把它注册为服务，这样我们就可以通过命令开启、关闭以及保持开机启动等功能
+若想使用此项功能，我们需要将代码中关于spring-boot-maven-plugin的配置修改为：
+<build>
+ <plugins>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-maven-plugin</artifactId>
+   <configuration>
+     <executable>true</executable>
+   </configuration>
+ </plugins>
+</build>
+然后使用mvn package打包
+主流的linux大多使用init.d或systemd来注册服务，下面以CentOS 6.6演示init.d注册服务：以CentOs 7.1演示systemd注册服务。
+用SSH客户端将jar包上传到CentOS的/var/apps下
+（1）安装JDK
+从Oracle官网下载JDK，注意选择的是:jdk-8u51-linux-x64.rpm。这是红帽系Linux系统专用安装包格式，执行下面命令安装JDK
+rpm -ivh jdk-8u51-linux-x64.rpm
+ (2)基于Linux的init.d部署
+ 注册服务，在CentOS6.6的终端执行:
+ sudo ln -s /var/apps/ch10-xxx.jar /etc/init.d/ch10
+ 其中ch10就是我们的服务名
+ 启动服务
+ service ch10 start
+ 停止服务
+ service ch10 stop
+ 服务状态
+ service ch10 status
+ 开机启动：
+ chkconfig ch10 on
+ 项目日志存放于/var/log/ch10.log下，可用cat或tail等命令查看
+ （3）基于Linux的Systemd部署
+ 在/etc/systemd/system/目录下新建文件ch10.service,填入下面内容:
+ [Unit]
+ Description=ch10
+ After=syslog.target
+ 
+ [Service]
+ ExecStart=/usr/bin/java -jar /var/apps/ch10-xxx.jar
+
+ [Install]
+ WantedBy=multi-user.target
+ 注意，在实际使用中修改Description和ExecStart后面的内容
+ 启动服务
+ systemctl start ch10
+ 或systemctl start ch10.service
+ 停止服务
+ systemctl stop ch10
+ 或systemctl stop ch10.service
+ 服务状态:
+ systemctl status ch10
+ 或systemctl status ch10.service
+ 开机启动
+ systemctl enable ch10
+ 或systemctl enable ch10.service
+ 项目日志
+ journalctl -u ch10
+ 或journalctl -u ch10.service
+ ### 10.2.2 war形式
+ 新建spring Boot项目时可选择打包方式是war形式
+ jar包转换成war包
+ 修改packaging为war
+ 增加下面依赖覆盖默认内嵌的tomcat依赖
+ ```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-tomcat</artifactId>
+    <scope>provided</scope>
+</dependency>
+```
+增加ServletInitializer类
+```java
+public class ServletInitializer extends SpringBootServletInitializer {
+    
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicatinBuilder application) {
+        return application.sources(XXXApplication.class);
+    } 
+}
+```
+## 10.3 云部署——基于Docker的部署
+本节我们将在CentOS 7.1上演示用Docker部署Spring Boot程序。前面我们讲述了使用已经编译好的Docker镜像，本节我们将讲述如何编译自己的Docker镜像，
+并运行镜像的容器。
+主流的云计算(PAAS)平台都支持发布Docker镜像。Docker是使用Dockerfile文件来编译自己的镜像的。
+### 10.3.1Dockerfile
+Dockerfile主要有如下的指令。
+（1）FROM指令
+FROM指令指明了当前镜像继承的基镜像。编译当前镜像时会自动下载基镜像。
+示例：
+FROM ubuntu
+（2）MAINTAINER指令
+MAINTAINER指令指明了当前镜像的作者
+示例：
+MAINTAINER wyf
+（3）
+RUN指令
+RUN指令可以在当前镜像上执行Linux命令并形成一个新的层。RUN是编译时（build）的动作。
+示例可有如下两种格式，CMD和ENTRYPOINT也是如此：
+RUN /bin/bash -c "echo helloworld"
+或RUN {"/bin/bash","-c","echo hello"}
+(4)CMD指令
+CMD指令指明了启动镜像容器时的默认行为，一个Dockerfile里只能有一个CMD指令。CMD指令里设定的命令可以在运行镜像时使用参数覆盖。CMD是运行时(run)的动作。
+示例：
+CMD echo "this is a test"
+可被docker run -d image_name echo "this is not a test"覆盖
+(5)EXPOSE指令
+EXPOSE指明了镜像运行时的容器必需监听指定的端口。
+示例：
+EXPOSE 8080
+(6)ENV指令
+ENV指令可用来设置环境变量
+示例：
+ENV myName = wyf
+或ENV myName wyf
+（7）ADD指令
+ADD指令是从当前工作目录复制文件到镜像目录中去。
+示例：
+ADD test.txt /mydir/
+(8)ENTRYPOINT指令
+ENTRYPOINT指令可以让容器像一个可执行程序一样运行，这样镜像运行时可以像软件一样接收参数执行。ENTRYPOINT是运行时（run）的动作
+示例：
+ENTRYPOINT ["/bin/echo"]
+我们可以向镜像传递参数运行：
+docker run -d image_name "this is not a test"
+### 10.3.2 安装Docker
+yum install docker
+启动Docker并保持开机自启:
+systemctl start docker
+systemctl enable docker
+### 10.3.3 项目目录及文件
+我们以docker-demo-0.0.1-SNAPSHOT.jar为演示项目。
+这个项目很简单，只是在DockerDemoApplication中加入
+ @RequestMapping("/")
+    public String home() {
+        return "Hello Docker!!!";
+    }
+将打好的jar包上传到centos上，在相同目录下
+新建一个Dockerfile文件，内容如下：
+FROM java:8
+
+MAINTAINER wyf
+
+ADD docker-demo-0.0.1-SNAPSHOT.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java","-jar","/app.jar"]
+解释：
+FROM java:8   基镜像为Java,标签(版本)为8
+MAINTAINER wyf  作者为wyf
+ADD docker-demo-0.0.1-SNAPSHOT.jar app.jar  将我们的docker-demo-0.0.1-SNAPSHOT.jar添加到镜像中，并重命名为app.jar
+EXPOSE 8080  运行镜像的容器，监听8080端口
+ENTRYPOINT ["java","-jar","/app.jar"]  启动时运行java -jar app.jar
+### 10.3.4 编译镜像
+在dockerfile所在的目录执行下面的命令，执行编译镜像
+docker build -t wisely/ch10docker .
+其中wisely/ch10docker为镜像名，我们设置wisely作为前缀，这也是Docker镜像的一种命名习惯。
+注意，最后一个“.”，这是用来指明Dockerfile路径的，编译完成后，查看本地镜像 docker images
+### 10.3.5运行
+通过下面命令运行
+docker run -d --name ch10 -p 8080:8080 wisely/ch10docker
+查看我们当前的容器状态
+docker ps
+## 10.4Spring Boot的测试
+    Spring Boot的测试和Spring MVC的测试类似。Spring Boot为我们提供了一个@SpringApplicationConfiguration来替代@ContextConfiguration,
+用来配置ApplicationContext。
+    在Spring Boot中，每次新建项目的时候，都会自动加上spring-boot-starter-test的依赖，这样我们就没有必要测试时再添加额外的jar包。
+    Spring Boot还会建一个当前项目的测试类，位于src/test/java的根包下。
+    本节我们将直接演示一个简单的测试，测试某一控制器方法是否满足测试用例。
+### 10.4.1 新建Spring Boot项目
+
+依赖为JPA、Web、hsqldb（内存数据库）
+
+### 10.4.2 业务代码
+
+# 第11章 应用监控
+SpringBoot提供了运行时的应用监控和管理的功能。我们可以通过http、JMS、SSH协议来进行操作。审计、健康及指标信息将会自动得到。
+Spring Boot提供了监控和管理端点，如下：
+端点名                        描述
+actuator                 所有EndPoint的列表，需加入spring HATEOAS支持
+autoconfig               当前应用的所有自动配置
+beans                    当前应用中所有Bean的信息
+configprops              当前应用中所有的配置属性
+dump                     显示当前应用线程状态信息
+evn                      显示当前应用当前环境信息
+health                   显示当前应用健康状况
+info                     显示当前应用信息
+metrics                  显示当前应用的各项指标信息
+shutdown                 关闭当前应用(默认关闭)
+trace                    显示追踪信息（默认最新的http请求）
+## 11.1 http
+我们可以通过http实现对应用的监控和管理，我们只需在pom.xml中增加下面依赖即可：
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
+既然通过http监控和管理，那么我们的项目中必然需要Web的依赖。本节需新建Spring Boot项目，依赖为：Actuator、Web、HATEOAS
+
+
+
+
+
+
+
 
 
 
